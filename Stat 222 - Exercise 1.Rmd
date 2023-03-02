@@ -1,0 +1,80 @@
+---
+title: "Stat 222 - Exercise 1"
+author: "kclazaro"
+date: "2023-02-21"
+output:
+  word_document: default
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+**Exercise.** Refer to the height-weight data set in the Lesson 2 Folder in the Class Drive. Assume the data is taken from certain population through random sampling. Let X,Y be the height and weight, respectively, of a randomly selected person in the population. Find the observed value of the following statistics in Excel or R.
+
+1. $\overline{X}$
+2. $S^2_Y$ (sample variance of Y)
+3. $Y_{(2)}$
+4. $M{'}_{X,2}$ (second sample raw moment of X)
+
+Using the data set, we get the following summary statistics.
+```{r}
+#Load the 'readxl' library to be able to parse Excel files. Then we assign the variable name 'weight_height' to the Excel data set. Lastly, we run the summary statistics of the data set.
+library(readxl)
+weight_height <- read_excel("Downloads/weight-height.xlsx")
+summary(weight_height)
+```
+
+To get the mean of the height column, we use the following code:
+```{r}
+# Get the mean of the Height column by column name
+xbar <- mean(weight_height$Height)
+```
+
+This means that the mean height of the data set is...
+```{r echo=FALSE}
+xbar
+```
+
+For the sample variance of Y, we use the following code:
+```{r}
+# Get the variance of the Weight column by column name
+var_y <- var(weight_height$Weight)
+```
+
+Using this, the variance of the weight column is...
+```{r echo=FALSE}
+var_y
+```
+
+In order to obtain the second lowest value in the Weight column, we will use the following code:
+```{r}
+# Sort the Weight column from lowest to highest, and we assign it to the 'weight_order' variable.
+weight_order <- sort(weight_height$Weight)
+```
+
+From this, it's easy to obtain the second smallest value, which is...
+```{r echo=FALSE}
+weight_order[2]
+```
+
+Lastly, to get the second sample raw moment of height, we can use the moments package.
+```{r}
+# Load the moments package then get the second raw moment by specifying the order.
+library(moments)
+second_raw_moment_height <- moment(weight_height$Height, order=2)
+```
+
+Which will then give us the second sample raw moment for the height column...
+```{r echo=FALSE}
+second_raw_moment_height
+```
+
+In summary, the following are the observed values for the statistics:
+```{r echo=FALSE}
+library(kableExtra)
+
+dt <- read_excel("Downloads/stat222-exercise1.xlsx")
+kbl(dt) %>%
+  kable_styling(bootstrap_options = "striped", full_width = F)
+```
+
