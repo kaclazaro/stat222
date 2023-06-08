@@ -44,6 +44,8 @@ State the problem as a two-sided hypothesis test. Give the null hypothesis and t
 
 ##### A3.
 
+Here is the problem as a two-sided hypothesis:
+
 $H_0$: The average Christmas spend of department store consumers is 5000 pesos.
 
 $H_a$: The average Christmas spend of department store consumers is not 5000 pesos.
@@ -64,18 +66,20 @@ Now, looking at our given data, for (1) we have spending in pesos which is conti
 
 Although our data does not meet the normality assumption, we can still go ahead with using one sample t-test as our sample size is robust enough and the violation is not that extreme. Also, the t-test is concerned with approximate normality and not strict normality. Real world data usually shows some degree of deviation from normality but as long as these deviations are acceptable and not severe then we can go ahead and use the one sample t-test.
 
-```{r include=TRUE}
+```{r ttest_assumption, include=TRUE, out.height="50%", out.width="50%", fig.align='center'}
+# Set up the grid layout and adjust the margin
+par(mfrow = c(1, 2), mar = c(4, 5, 3, 5))
 # Visual test of normality of the data
-hist(cspend$spending)
+hist(cspend$spending, main = "Histogram of Christmas Spending", xlab = "Christmas Spend")
 # Visual test of data variability
-boxplot(cspend$spending)
+boxplot(cspend$spending, main = "Boxplot of Christmas Spending", ylab = "Christmas Spend")
 ```
 
 ##### Q5.
 
 Compute the observed value of your test statistic. The sample variance may be computed using the var() function in R.
 
-##### A1.
+##### A5.
 
 To compute for $t$ we will use the following formula:
 $$
@@ -92,7 +96,7 @@ And right now we have the following values computed/given:
 2.  $\bar{x}$ = 4658.872  
 3.  $n$ = 436   
 
-```{r include=TRUE}
+```{r given, include=TRUE}
 # Given data from the problem
 p_mean <- 5000
 # Compute sample size
@@ -101,7 +105,7 @@ s_size <- NROW(cspend$spending)
 
 To get the value of $s$, we use the following:
 
-```{r include=TRUE}
+```{r sd_comp, include=TRUE}
 # Compute the sample variance
 s_var <- var(cspend$spending)
 # Compute the standard deviation 
@@ -112,7 +116,7 @@ print(s_dev)
 
 Now that we have all the variables we need to compute the one sample t-test, we can just plug them in to compute for our $t$ statistic.
 
-```{r include=TRUE}
+```{r tstat_comp, include=TRUE}
 # Compute for the t-statistic
 t <- (s_mean - p_mean) / (s_dev / sqrt(s_size))
 # Print the computed t-statistic
@@ -132,15 +136,15 @@ $$
 So, in this case, the null distribution follows a t-distribution with 435 degrees of freedom $(t_{435})$.
 
 To visualize it further:
-```{r include=TRUE}
+```{r null_distribution, include=TRUE, out.height="30%", out.width="50%", fig.align='center'}
 # Set seed so that the computed null distribution will be fixed
 set.seed(31)
 # Set the degrees of freedom
-df <- 435
+deg_free <- 435
 # Generate the null distribution
-null_dist <- rt(s_size, df)
+null_dist <- rt(s_size, deg_free)
 # Plot the null distribution
-hist(null_dist)
+hist(null_dist, main = "Null Distribution of the Test Statistic 't'")
 ```
 
 ##### Q7.
@@ -149,13 +153,13 @@ Find the p-value corresponding to the observed value of your test statistic.
 
 ##### A7.
 
-For a two-sided t-test, the $p$-value is given by $p=P(|T|>t)$. Which is equal to the R code 2*(1-pt(abs(t), n-1)).
+For a two-sided t-test, the $p$-value is given by $p=P(|T|>t)$, which is equal to the R code 2*(1-pt(abs(t), n-1)).
 
-Since we have all of these variables, we can compute the $p$-value by plugging in the different values we have.
+Since we have all of these variables computed from previous questions, we can calculate the $p$-value by plugging in the different values we have.
 
-```{r include=TRUE}
+```{r p_value, include=TRUE}
 # Plugging in the values
-p_val <- 2*(1-pt(abs(t), df))
+p_val <- 2*(1-pt(abs(t), deg_free))
 # Print the computed p-value
 print(p_val)
 ```
@@ -166,9 +170,27 @@ Based on your answer in (7), what is your conclusion?
 
 ##### A8.
 
+As the $p$-value (0.0061) is less than our level of significance $(\alpha=0.05)$, then we reject the null hypothesis that Christmas spend of department store consumers is equal to 5000 pesos. There is sufficient evidence to suggest that the Christmas spend of department store consumers significantly differs from 5000 pesos.
 
+##### Q9.
 
-9.	Alternatively, what is the critical value corresponding to the significance level? You need to use the qt() function. Compare the critical value and the test statistic. What is your conclusion based on the critical value? Is your answer consistent with your answer in (8)?
+Alternatively, what is the critical value corresponding to the significance level? You need to use the qt() function. Compare the critical value and the test statistic. What is your conclusion based on the critical value? Is your answer consistent with your answer in (8)?
+
+##### A9.
+
+Using the critical value approach, we will get:
+```{r critical_value, include=TRUE}
+# Given alpha
+alpha <- 0.05
+# Compute for the critical value of a two-tailed test
+crit_val <- qt(p=1-alpha/2, df=deg_free)
+# Print computed critical value
+print(crit_val)
+```
+Since the critical value |1.965432| < |-2.759695| $t$-value, we reject the null hypothesis that the average Christmas spend of department store consumers is equal to 5000 pesos. This indicates that there is sufficient evidence to suggest that the average Christmas spend of department store consumers significantly differs from 5000 pesos. As the $t$-value obtained is negative, it suggests that the average Christmas spend is significantly lower than 5000 pesos.
+
+And yes, this is consistent with my answer in Q8.
+
 
 ##### Q10.
 
@@ -178,7 +200,11 @@ Now perform the test again, but this time use the t.test() function in R. You sh
 
 Using the t.test() function, we get the following:
 
-```{r include=TRUE}
+```{r ttest, include=TRUE}
+# Run the t-test using the t.test() function
 ttest <- t.test(cspend$spending, mu=p_mean, alternative = "two.sided")
+# Print the computed t-test
 print(ttest)
 ```
+
+The answers obtained in the t.test() function is consistent with what I got from the other questions.
